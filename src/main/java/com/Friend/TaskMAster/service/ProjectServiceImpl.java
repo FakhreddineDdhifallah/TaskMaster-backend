@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -49,16 +51,41 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<Project> getProjectByTeam(User user, String category, String tag) throws Exception {
-        return List.of();
+        List<Project> projects = projectRepository.findByTeamContainingOrOwner(user , user);
+
+        if (category!=null){
+            projects=projects.stream().filter(project -> project.getCategory().equals(category))
+                    .collect(Collectors.toList());
+
+        }
+
+
+        if (tag!=null){
+            projects=projects.stream().filter(project -> project.getTags().contains(tag))
+                    .collect(Collectors.toList());
+
+        }
+
+        return projects;
+
     }
 
     @Override
     public Project getProjectById(long projectId) throws Exception {
-        return null;
+        Optional<Project> optionalProject = projectRepository.findById(projectId);
+        if (optionalProject.isEmpty()){
+            throw new Exception("project not found");
+        }
+
+        return optionalProject.get();
     }
 
     @Override
     public void deleteProject(long projectId, long userId) throws Exception {
+
+        getProjectById(projectId);
+        //userService.findUserById(userId);
+        projectRepository.deleteById(projectId);
 
     }
 
