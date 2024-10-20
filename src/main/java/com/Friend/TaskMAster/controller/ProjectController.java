@@ -1,5 +1,6 @@
 ﻿package com.Friend.TaskMAster.controller;
 
+import com.Friend.TaskMAster.model.Chat;
 import com.Friend.TaskMAster.model.Project;
 import com.Friend.TaskMAster.model.User;
 import com.Friend.TaskMAster.response.MessageResponse;
@@ -105,6 +106,21 @@ public class ProjectController {
         return new ResponseEntity<>(projects, HttpStatus.OK);
 
     }
+    @GetMapping("/{projectId}/chat")
+    public ResponseEntity<Chat>getChatByProjectId(
+            @PathVariable Long projectId,
+
+            @RequestHeader("Authorization") String jwt
+
+    ) throws Exception{
+        User user =userService.findUserProfileByJwt(jwt);
+        Chat chat = projectService.getChatByProjectId(projectId);
+        return new ResponseEntity<>(chat, HttpStatus.OK);
+
+    }
+
+
+
 }
 
 
