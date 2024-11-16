@@ -2,27 +2,60 @@ package com.Friend.TaskMAster.service;
 
 
 import com.Friend.TaskMAster.model.Invitation;
+import com.Friend.TaskMAster.repository.InvitationRepository;
+import jakarta.mail.MessagingException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class InvitationServiceImpl implements InvitationService {
+
+    @Autowired
+    private InvitationRepository invitationRepository;
+
+    @Autowired
+    private EmailService emailService;
+
+
+
     @Override
-    public void sendInvitation(String email, long projectId) {
+    public void sendInvitation(String email, long projectId) throws MessagingException {
+        String invitationToken = UUID.randomUUID().toString();
+        Invitation invitation = new Invitation();
+        invitation.setEmail(email);
+        invitation.setProjectId(projectId);
+        invitation.setToken(invitationToken);
+
+        invitationRepository.save(invitation);
+        String invitationLink="http://localhost:5173/accept_invitation?token="+invitationToken;
+        emailService.sendEmailWithToken(email , invitationLink);
+
 
     }
 
     @Override
-    public Invitation acceptInvitation(String token, long userId) {
-        return null;
+    public Invitation acceptInvitation(String token, long userId) throws Exception {
+        Invitation invitation = invitationRepository.findByToken(token);
+        if(invitation==null){
+            throw  new Exception("invalid Invitation token");
+        }
+        return invitation;
     }
 
     @Override
     public String getTokenByUserMail(String userEmail) {
-        return "";
+        Invitation invitation = invitationRepository.findByEmail(userEmail);
+
+        return invitation.getToken();
+
     }
 
     @Override
     public void deleteToken(String token) {
+        Invitation invitation = invitationRepository.findByToken(token);
+        invitationRepository.delete(invitation);
 
     }
 }

@@ -1,12 +1,14 @@
 package com.Friend.TaskMAster.service;
 
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMailMessage;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
 
+@Service
 public class EmailServiceImpl implements  EmailService{
 
     @Autowired
@@ -14,7 +16,7 @@ public class EmailServiceImpl implements  EmailService{
 
 
     @Override
-    public void sendEmailWithToken(String userEmail, String link) {
+    public void sendEmailWithToken(String userEmail, String link) throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage,"utf-8");
 
